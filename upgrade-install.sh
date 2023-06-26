@@ -16,4 +16,4 @@ cat /etc/redhat-release | grep 37 && echo "Update to 38" && dnf system-upgrade d
 
 dnf system-upgrade reboot
 
-cat /etc/redhat-release | grep 38 && echo "Install packages on 38" && dnf -y update && dnf install -y --allowerasing vim-enhanced vim-default-editor mc git tig htop iotop zsh
+cat /etc/redhat-release | grep 38 && echo "Install packages on 38" && dnf -y update && dnf install -y --allowerasing vim-enhanced vim-default-editor mc git tig htop iotop zsh ansible
