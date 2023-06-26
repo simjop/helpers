@@ -1,0 +1,39 @@
+---
+- name: Update SSH Authorized Keys from GitHub
+  hosts: localhost
+  become: yes
+
+  vars:
+    github_repo: "https://github.com/simjop/helpers.git"
+
+  tasks:
+    - name: Clone the GitHub repository
+      git:
+        repo: "{{ github_repo }}"
+        dest: /tmp/keys-repo
+      register: clone_output
+
+    - name: List pubkeys in repository
+      command: ls /tmp/keys-repo/pubkeys/
+      register: user_keys
+      changed_when: false
+
+    - name: Debug output pubkeys
+      debug: msg="{{ user_keys.stdout_lines }}"
+
+    - name: Read SSH keys from files and update authorized_keys
+      authorized_key:
+        user: "{{ item }}"
+        key: "{{ lookup('file', '/tmp/keys-repo/pubkeys/' + item) }}"
+      loop: "{{ user_keys.stdout_lines }}"
+
+    - name: Add public keys to root user
+      authorized_key:
+        user: root
+        key: "{{ lookup('file', '/tmp/keys-repo/pubkeys/' + item) }}"
+      loop: "{{ user_keys.stdout_lines }}"
+
+    - name: Remove the cloned repository
+      file:
+        path: /tmp/keys-repo
+        state: absent
